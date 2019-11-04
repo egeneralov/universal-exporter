@@ -87,7 +87,8 @@ func getData () (map[string]interface {}) {
 
 func toPrometheus (md map[string]interface {}) (string) {
   var answer string
-  for _, k := range Keys(md) {
+//   for _, k := range Keys(md) {
+  for k, _ := range md {
     key := strings.Replace(k, "-" , "_", -1)
     if isStartsWithInt(key) {
       key = fmt.Sprintf("s%s", key)
