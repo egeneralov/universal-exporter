@@ -63,6 +63,7 @@ func parseBody (body []byte) (interface{}) {
 }
 
 func isStartsWithInt(payload string) (bool) {
+  fmt.Println(payload)
   return unicode.IsDigit(rune(payload[0]))
 }
 
