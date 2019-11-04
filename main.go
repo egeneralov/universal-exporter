@@ -91,6 +91,10 @@ func toPrometheus (md map[string]interface {}) (string) {
         answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s{value=\"%s\"} 1\n", answer, key, key, key, key, md[k])
       case int:
         answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
+      case float32:
+        answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
+      case float64:
+        answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
       default:
     }
     
