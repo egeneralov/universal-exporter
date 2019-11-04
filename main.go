@@ -37,8 +37,14 @@ func parseBody (body []byte) (interface{}) {
   payload = map[string]interface{}{}
 
   for _, line := range strings.Split(string(body), itemsDelimiter) {
+    if line == "" {
+      continue
+    }
     data := strings.Split(line, kvDelimiter)
-    if len(data) != 2 { continue }
+    if len(data) != 2 {
+      fmt.Printf("Skipping raw line: %s\n", line)
+      continue
+    }
     key := data[0]
     value := data[0]
     
