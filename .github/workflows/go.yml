@@ -1,0 +1,39 @@
+name: Go
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Build
+      run: |
+        export CGO_ENABLED=0
+        export GOARCH=amd64
+        export GO111MODULE=on
+        go mod download
+        GOOS=darwin go build -a -v -installsuffix cgo -ldflags="-w -s" -o universal-exporter-darwin-amd64
+        GOOS=linux go build -a -v -installsuffix cgo -ldflags="-w -s" -o universal-exporter-linux-amd64
+
+    - name: Upload darwin artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: darwin
+        path: universal-exporter-darwin-amd64
+
+    - name: Upload linux artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: darwin
+        path: universal-exporter-linux-amd64
+
