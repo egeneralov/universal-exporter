@@ -109,6 +109,7 @@ func toPrometheus (md map[string]interface {}) (string) {
   return answer
 }
 
+
 func toJson (payload map[string]interface {}) (string) {
   return interfaceToJson(payload)
 }
