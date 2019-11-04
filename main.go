@@ -62,11 +62,6 @@ func parseBody (body []byte) (interface{}) {
   return payload
 }
 
-func isStartsWithInt(payload string) (bool) {
-  fmt.Println(payload)
-  return unicode.IsDigit(rune(payload[0]))
-}
-
 func interfaceToJson(payload interface{}) (string) {
   resultJson, err := json.Marshal(payload)
   if err != nil { panic(err) }
@@ -86,8 +81,11 @@ func toPrometheus (md map[string]interface {}) (string) {
   
   for k, _ := range md {
     key := strings.Replace(k, "-" , "_", -1)
-    if isStartsWithInt(key) {
-      key = fmt.Sprintf("s%s", key)
+    
+    if len(key) > 1 {
+      if unicode.IsDigit(rune(key[0])) {
+        key = fmt.Sprintf("s%s", key)
+      }
     }
     
     switch md[k].(type) {
