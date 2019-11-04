@@ -57,24 +57,12 @@ func parseBody (body []byte) (interface{}) {
 }
 
 func isInt(payload string) (bool) {
-  var result bool
   _, err := strconv.Atoi(payload)
-  if err != nil {
-    result = false
-  } else {
-    result = true
-  }
-  return result
+  return err == nil
 }
 
 func isStartsWithInt(payload string) (bool) {
-  var first rune
-  for _, c := range payload {
-    first = c
-    break
-  }
-  r := fmt.Sprintf("%s", string(first))
-  return isInt(r)
+  return isInt(string([]byte(payload)[0]))
 }
 
 func interfaceToJson(payload interface{}) (string) {
