@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "flag"
+  "unicode"
   "strconv"
   "strings"
   "net/http"
@@ -61,13 +62,8 @@ func parseBody (body []byte) (interface{}) {
   return payload
 }
 
-func isInt(payload string) (bool) {
-  _, err := strconv.Atoi(payload)
-  return err == nil
-}
-
 func isStartsWithInt(payload string) (bool) {
-  return isInt(string([]byte(payload)[0]))
+  return unicode.IsDigit(rune(payload[0]))
 }
 
 func interfaceToJson(payload interface{}) (string) {
