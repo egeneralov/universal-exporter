@@ -22,7 +22,8 @@ variables:
     paths:
       - ${CI_PROJECT_DIR}/universal-exporter-${GOOS}-${GOARCH}
     when: on_success
-    expire_in: 90 days
+    expire_in: 180 days
+
 
 darwin:
   variables:
