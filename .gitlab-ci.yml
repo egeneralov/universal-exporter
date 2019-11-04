@@ -7,7 +7,7 @@ variables:
   REPO_NAME: gitlab.com/egeneralov/universal-exporter
 
 .build: &build
-  image: golang:1.12
+  image: golang:1.13-alpine
   stage: build
   before_script:
     - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
