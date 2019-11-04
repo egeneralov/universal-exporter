@@ -33,6 +33,7 @@ func getRawData (url string) ([]byte) {
   return body
 }
 
+
 func parseBody (body []byte) (interface{}) {
   var payload interface{}
   payload = map[string]interface{}{}
@@ -62,11 +63,13 @@ func parseBody (body []byte) (interface{}) {
   return payload
 }
 
+
 func interfaceToJson(payload interface{}) (string) {
   resultJson, err := json.Marshal(payload)
   if err != nil { panic(err) }
   return string(resultJson)
 }
+
 
 func getData () (map[string]interface {}) {
   body := getRawData(scrapeURL)
@@ -74,6 +77,7 @@ func getData () (map[string]interface {}) {
   md := payload.(map[string]interface{})
   return md
 }
+
 
 func toPrometheus (md map[string]interface {}) (string) {
   
@@ -108,7 +112,6 @@ func toPrometheus (md map[string]interface {}) (string) {
 func toJson (payload map[string]interface {}) (string) {
   return interfaceToJson(payload)
 }
-
 
 
 func main() {
