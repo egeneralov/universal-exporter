@@ -37,12 +37,10 @@ func parseBody (body []byte) (interface{}) {
   payload = map[string]interface{}{}
 
   for _, line := range strings.Split(string(body), itemsDelimiter) {
-    key := ""
-    value := ""
-    for _, kv := range strings.Split(line, kvDelimiter) {
-      if key == "" { key = kv } else { value = kv }
-    }
-    if key == "" { continue }
+    data := strings.Split(line, kvDelimiter)
+    if len(data) != 2 { continue }
+    key := data[0]
+    value := data[0]
     
     key = slug.Make(key)
     
