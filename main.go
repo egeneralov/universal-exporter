@@ -71,13 +71,6 @@ func interfaceToJson(payload interface{}) (string) {
   return string(resultJson)
 }
 
-func Keys(m map[string]interface{}) (keys []string) {
-  for k := range m {
-    keys = append(keys, k)
-  }
-  return keys
-}
-
 func getData () (map[string]interface {}) {
   body := getRawData(scrapeURL)
   payload := parseBody(body)
@@ -87,7 +80,6 @@ func getData () (map[string]interface {}) {
 
 func toPrometheus (md map[string]interface {}) (string) {
   var answer string
-//   for _, k := range Keys(md) {
   for k, _ := range md {
     key := strings.Replace(k, "-" , "_", -1)
     if isStartsWithInt(key) {
