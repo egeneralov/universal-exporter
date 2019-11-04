@@ -50,8 +50,9 @@ func parseBody (body []byte) (interface{}) {
     
     key = slug.Make(key)
     
-    if isInt(value) {
-      intValue , _ := strconv.Atoi(value)
+    
+    intValue, err := strconv.Atoi(value)
+    if err == nil {
       payload.(map[string]interface{})[key] = intValue
     } else {
       payload.(map[string]interface{})[key] = value
