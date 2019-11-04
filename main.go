@@ -46,7 +46,7 @@ func parseBody (body []byte) (interface{}) {
       continue
     }
     key := data[0]
-    value := data[0]
+    value := data[1]
     
     key = slug.Make(key)
     
@@ -83,7 +83,9 @@ func getData () (map[string]interface {}) {
 }
 
 func toPrometheus (md map[string]interface {}) (string) {
+  
   var answer string
+  
   for k, _ := range md {
     key := strings.Replace(k, "-" , "_", -1)
     if isStartsWithInt(key) {
