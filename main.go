@@ -82,6 +82,7 @@ func toPrometheus (md map[string]interface {}) (string) {
   for k, _ := range md {
     key := strings.Replace(k, "-" , "_", -1)
     
+    /* Prometheus requesting to first symbol in metric name to be string */
     if len(key) > 1 {
       if unicode.IsDigit(rune(key[0])) {
         key = fmt.Sprintf("s%s", key)
