@@ -1,143 +1,149 @@
 package main
 
 import (
-  "fmt"
-  "flag"
-  "unicode"
-  "strconv"
-  "strings"
-  "net/http"
-  "io/ioutil"
-  "encoding/json"
-  
-  "github.com/gosimple/slug"
+    "encoding/json"
+    "flag"
+    "fmt"
+    "io/ioutil"
+    "net/http"
+    "strconv"
+    "strings"
+    "unicode"
 
+    "github.com/gosimple/slug"
 )
-
 
 var (
-  workMode string
-  bind string
-  scrapeURL string
-  itemsDelimiter string
-  kvDelimiter string
+    workMode       string
+    bind           string
+    scrapeURL      string
+    itemsDelimiter string
+    kvDelimiter    string
 )
 
-
-func getRawData (url string) ([]byte) {
-  resp, err := http.Get(url)
-  if err != nil { panic(err) }
-  defer resp.Body.Close()
-  body, err := ioutil.ReadAll(resp.Body)
-  if err != nil { panic(err) }
-  return body
-}
-
-
-func parseBody (body []byte) (interface{}) {
-  var payload interface{}
-  payload = map[string]interface{}{}
-
-  for _, line := range strings.Split(string(body), itemsDelimiter) {
-    if line == "" {
-      continue
+func getRawData(url string) []byte {
+    resp, err := http.Get(url)
+    if err != nil {
+        panic(err)
     }
-    data := strings.Split(line, kvDelimiter)
-    if len(data) != 2 {
-      fmt.Printf("Skipping raw line: %s\n", line)
-      continue
+    defer func() {
+        err = resp.Body.Close()
+        if err != nil {
+            panic(err)
+        }
+    }()
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        panic(err)
     }
-    key := data[0]
-    value := data[1]
-    
-    key = slug.Make(key)
-    
-    
-    intValue, err := strconv.Atoi(value)
-    if err == nil {
-      payload.(map[string]interface{})[key] = intValue
-    } else {
-      payload.(map[string]interface{})[key] = value
+    return body
+}
+
+func parseBody(body []byte) interface{} {
+    //var payload interface{}
+    payload := interface{}(map[string]interface{}{})
+
+    for _, line := range strings.Split(string(body), itemsDelimiter) {
+        if line == "" {
+            continue
+        }
+        data := strings.Split(line, kvDelimiter)
+        if len(data) != 2 {
+            fmt.Printf("Skipping raw line: %s\n", line)
+            continue
+        }
+        key := data[0]
+        value := data[1]
+
+        key = slug.Make(key)
+
+        intValue, err := strconv.Atoi(value)
+        if err == nil {
+            payload.(map[string]interface{})[key] = intValue
+        } else {
+            payload.(map[string]interface{})[key] = value
+        }
     }
-  }
-  return payload
+    return payload
 }
 
-
-func interfaceToJson(payload interface{}) (string) {
-  resultJson, err := json.Marshal(payload)
-  if err != nil { panic(err) }
-  return string(resultJson)
-}
-
-
-func getData () (map[string]interface {}) {
-  body := getRawData(scrapeURL)
-  payload := parseBody(body)
-  md := payload.(map[string]interface{})
-  return md
-}
-
-
-func toPrometheus (md map[string]interface {}) (string) {
-  
-  var answer string
-  
-  for k, _ := range md {
-    key := strings.Replace(k, "-" , "_", -1)
-    
-    /* Prometheus requesting to first symbol in metric name to be string */
-    if len(key) > 1 {
-      if unicode.IsDigit(rune(key[0])) {
-        key = fmt.Sprintf("s%s", key)
-      }
+func interfaceToJson(payload interface{}) string {
+    resultJson, err := json.Marshal(payload)
+    if err != nil {
+        panic(err)
     }
-    
-    switch md[k].(type) {
-      case string:
-        answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s{value=\"%s\"} 1\n", answer, key, key, key, key, md[k])
-      case int:
-        answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
-      case float32:
-        answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
-      case float64:
-        answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
-      default:
+    return string(resultJson)
+}
+
+func getData() map[string]interface{} {
+    body := getRawData(scrapeURL)
+    payload := parseBody(body)
+    md := payload.(map[string]interface{})
+    return md
+}
+
+func toPrometheus(md map[string]interface{}) string {
+
+    var answer string
+
+    for k := range md {
+        key := strings.Replace(k, "-", "_", -1)
+
+        /* Prometheus requesting to first symbol in metric name to be string */
+        if len(key) > 1 {
+            if unicode.IsDigit(rune(key[0])) {
+                key = fmt.Sprintf("s%s", key)
+            }
+        }
+
+        switch md[k].(type) {
+        case string:
+            answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s{value=\"%s\"} 1\n", answer, key, key, key, key, md[k])
+        case int:
+            answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
+        case float32:
+            answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
+        case float64:
+            answer = fmt.Sprintf("%s# HELP %s %s \n# TYPE %s gauge\n%s %d\n", answer, key, key, key, key, md[k])
+        default:
+        }
+
     }
-    
-  }
-  return answer
+    return answer
 }
 
-
-func toJson (payload map[string]interface {}) (string) {
-  return interfaceToJson(payload)
+func toJson(payload map[string]interface{}) string {
+    return interfaceToJson(payload)
 }
-
 
 func main() {
-  
-  flag.StringVar(&workMode, "mode", "json", "what to do [json,prometheus,exporter]")
-  flag.StringVar(&bind, "bind", "0.0.0.0:9682", "bind to (golang http server)")
-  flag.StringVar(&scrapeURL, "url", "http://10.0.0.1/cgi-bin/sysconf.cgi?page=ajax&action=get_status", "url to parse")
-  flag.StringVar(&itemsDelimiter, "itemsDelimiter", "\n", "items (or lines) delimiter")
-  flag.StringVar(&kvDelimiter, "kvDelimiter", "=", "key/value delimiter")
-  flag.Parse()
-  
-  md := getData()
-  
-  switch workMode {
+
+    flag.StringVar(&workMode, "mode", "json", "what to do [json,prometheus,exporter]")
+    flag.StringVar(&bind, "bind", "0.0.0.0:9682", "bind to (golang http server)")
+    flag.StringVar(&scrapeURL, "url", "http://10.0.0.1/cgi-bin/sysconf.cgi?page=ajax&action=get_status", "url to parse")
+    flag.StringVar(&itemsDelimiter, "itemsDelimiter", "\n", "items (or lines) delimiter")
+    flag.StringVar(&kvDelimiter, "kvDelimiter", "=", "key/value delimiter")
+    flag.Parse()
+
+    md := getData()
+
+    switch workMode {
     case "prometheus":
-      fmt.Println(toPrometheus(md))
+        fmt.Println(toPrometheus(md))
     case "exporter":
-      http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, toPrometheus(getData()))
-      })
-      fmt.Printf("binding exporter to %s\n", bind)
-      err := http.ListenAndServe(bind, nil)
-      if err != nil { panic(err) }
+        http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+            _, err := fmt.Fprint(w, toPrometheus(getData()))
+            if err != nil {
+                panic(err)
+            }
+        })
+        fmt.Printf("binding exporter to %s\n", bind)
+        err := http.ListenAndServe(bind, nil)
+        if err != nil {
+            panic(err)
+        }
     default:
-      fmt.Println(toJson(md))
-  }
-  
+        fmt.Println(toJson(md))
+    }
+
 }
