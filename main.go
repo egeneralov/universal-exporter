@@ -35,8 +35,8 @@ func getRawData (url string) ([]byte) {
 
 
 func parseBody (body []byte) (interface{}) {
-  var payload interface{}
-  payload = map[string]interface{}{}
+  //var payload interface{}
+  payload := interface{}(map[string]interface{}{})
 
   for _, line := range strings.Split(string(body), itemsDelimiter) {
     if line == "" {
