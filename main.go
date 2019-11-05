@@ -131,7 +131,7 @@ func main() {
       fmt.Println(toPrometheus(md))
     case "exporter":
       http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, toPrometheus(getData()))
+        fmt.Fprint(w, toPrometheus(getData()))
       })
       fmt.Printf("binding exporter to %s\n", bind)
       err := http.ListenAndServe(bind, nil)
