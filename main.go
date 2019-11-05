@@ -83,7 +83,7 @@ func toPrometheus (md map[string]interface {}) (string) {
   
   var answer string
   
-  for k, _ := range md {
+  for k := range md {
     key := strings.Replace(k, "-" , "_", -1)
     
     /* Prometheus requesting to first symbol in metric name to be string */
